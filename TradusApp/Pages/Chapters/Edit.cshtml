@@ -1,0 +1,173 @@
+@page
+@model TradusApp.Pages.Chapters.EditModel
+@{
+    ViewData["Title"] = "Editar Capítulo";
+}
+
+<style>
+    :root {
+        --primary: #4F46E5;
+        --primary2: #4338CA;
+        --bg-light: #f8f9fc;
+        --border: #e5e7eb;
+        --text-dark: #2d3748;
+    }
+
+    .page-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+        .card h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: .5rem;
+        }
+
+    /* FORM ELEMENTS */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 1rem;
+        display: block;
+        margin-bottom: .4rem;
+        color: #374151;
+    }
+
+    .form-input,
+    .form-textarea {
+        width: 100%;
+        padding: .75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        background: #fdfdfd;
+        transition: border .2s, box-shadow .2s;
+    }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79,70,229,.2);
+            outline: none;
+        }
+
+    .form-textarea {
+        min-height: 260px;
+        resize: vertical;
+    }
+
+    .info-box {
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        padding: .85rem 1.2rem;
+        border-radius: 10px;
+        color: #3730a3;
+        margin-bottom: 1.5rem;
+        font-size: .95rem;
+    }
+
+    /* BUTTONS */
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn {
+        padding: .75rem 1.4rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        border: none;
+        transition: background .2s;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: #fff;
+    }
+
+        .btn-primary:hover {
+            background: var(--primary2);
+        }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #111827;
+    }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+</style>
+
+<div class="page-container">
+    <div class="card">
+        <h1>Editar Capítulo</h1>
+
+        <form method="post" id="chapterEditForm">
+            <input type="hidden" asp-for="Input.Id" />
+            <input type="hidden" asp-for="Input.VersionActual" />
+
+            <div class="form-group">
+                <label asp-for="Input.Titulo" class="form-label"></label>
+                <input asp-for="Input.Titulo" class="form-input" />
+                <span asp-validation-for="Input.Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Contenido" class="form-label"></label>
+                <textarea asp-for="Input.Contenido" class="form-textarea"></textarea>
+                <span asp-validation-for="Input.Contenido" class="text-danger"></span>
+            </div>
+
+            <div class="info-box">
+                Cada cambio guardado creará una nueva versión automáticamente.
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                <a class="btn btn-secondary" asp-page="/Books/Manage">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            let changed = false;
+            const form = document.getElementById('chapterEditForm');
+
+            form.addEventListener('input', () => changed = true);
+
+            window.addEventListener('beforeunload', function (e) {
+                if (changed) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+        })();
+    </script>
+}
