@@ -1,0 +1,56 @@
+@page
+@model TradusApp.Pages.Chapters.DetailsModel
+@{
+    ViewData["Title"] = "Detalle de Capítulo";
+}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Capítulo @Model.ViewModel.Chapter.Numero - @Model.ViewModel.Chapter.Titulo</h1>
+        <a class="btn btn-outline-secondary" asp-page="/Chapters/Edit" asp-route-id="@Model.ViewModel.Chapter.Id">Editar</a>
+    </div>
+    <div class="mb-4">
+        <h5>Versión actual: @Model.ViewModel.Chapter.VersionActual</h5>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <h4>Contenido</h4>
+            <article class="border rounded p-3 bg-light">
+                @Html.Raw(Model.ViewModel.Chapter.Contenido?.Replace("\n", "<br />"))
+            </article>
+        </div>
+        <div class="col-lg-4">
+            <h4>Historial de versiones</h4>
+            @await Html.PartialAsync("_ChapterTable", Model.ViewModel.Chapter.Versions)
+
+            <h4 class="mt-4">Comentarios</h4>
+            <form method="get" class="mb-2">
+                <input type="hidden" name="id" value="@Model.ViewModel.Chapter.Id" />
+                <div class="input-group">
+                    <input name="search" value="@Model.ViewModel.Search" placeholder="Buscar..." class="form-control" />
+                    <button class="btn btn-outline-primary" type="submit">Buscar</button>
+                </div>
+            </form>
+
+            @await Html.PartialAsync("_CommentTable", Model.ViewModel.Comments)
+
+            <form method="post" asp-page-handler="AddComment" class="mt-3">
+                <input type="hidden" asp-for="NewComment.CapituloId" />
+                <div class="row g-2">
+                    <div class="col-12">
+                        <input asp-for="NewComment.Autor" class="form-control" placeholder="Tu nombre" />
+                        <span asp-validation-for="NewComment.Autor" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <textarea asp-for="NewComment.Contenido" class="form-control" rows="3" placeholder="Escribe un comentario"></textarea>
+                        <span asp-validation-for="NewComment.Contenido" class="text-danger"></span>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-2" type="submit">Comentar</button>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

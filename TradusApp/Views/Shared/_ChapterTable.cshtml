@@ -1,0 +1,22 @@
+@model IEnumerable<TradusApp.Models.Chapters.ChapterVersionItemDto>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Versión</th>
+                <th>Notas</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in Model)
+            {
+                <tr>
+                    <td>@v.Version</td>
+                    <td>@v.Notas</td>
+                    <td>@v.CreatedAt.ToLocalTime()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

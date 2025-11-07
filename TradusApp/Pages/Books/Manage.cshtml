@@ -1,0 +1,152 @@
+@page
+@model TradusApp.Pages.Books.ManageModel
+@{
+    ViewData["Title"] = "Gestión de Traducciones";
+}
+<style>
+/* Scoped styles for Manage page */
+.mg * { box-sizing: border-box; }
+.mg { font-family: 'Montserrat', sans-serif; }
+.mg-bg { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: #fff; border-radius: 16px; }
+.mg-header { text-align: center; padding: 2rem 0; }
+.mg-logo { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 700; letter-spacing: .5px; text-shadow: 2px 2px 4px rgba(0,0,0,.25); }
+.mg-tag { font-size: 1.05rem; opacity: .9; }
+.mg-sub { font-size: .95rem; max-width: 680px; margin: .75rem auto 0; background: rgba(255,255,255,.15); padding: .6rem 1rem; border-radius: 10px; }
+.mg-wrapper { display: grid; grid-template-columns: 1fr 2fr; gap: 1.25rem; }
+.mg-list, .mg-details { background: rgba(255,255,255,.12); backdrop-filter: blur(8px); border-radius: 15px; padding: 1rem; box-shadow: 0 8px 25px rgba(0,0,0,.18); }
+.mg-list { max-height: 60vh; overflow: auto; }
+.mg-title { font-size: 1.25rem; margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 1px solid rgba(255,255,255,.3); font-weight: 500; }
+.mg-item { background: rgba(255,255,255,.15); border-radius: 10px; padding: .8rem; margin-bottom: .75rem; display:flex; justify-content:space-between; align-items:center; transition: .2s ease; }
+.mg-item:hover { background: rgba(255,255,255,.25); transform: translateX(4px); }
+.mg-item.active { background: rgba(255,255,255,.3); border-left: 4px solid #fff; }
+.mg-item .name { font-weight: 500; }
+.mg-item .meta { font-size: .85rem; opacity: .85; }
+.mg-form-group { margin-bottom: 1rem; }
+.mg-label { display:block; margin-bottom:.35rem; font-weight:500; }
+.mg-input, .mg-textarea, .mg-select { width:100%; padding:.7rem .9rem; border-radius:8px; border:1px solid rgba(255,255,255,.35); background:rgba(255,255,255,.15); color:#fff; }
+.mg-textarea { min-height: 120px; resize: vertical; }
+.mg-actions { display:flex; gap:.75rem; margin-top: 1rem; }
+.mg-btn { padding:.7rem 1.2rem; border:none; border-radius:8px; font-weight:500; cursor:pointer; transition:.2s ease; }
+.mg-btn.primary { background:#fff; color:#6a11cb; }
+.mg-btn.primary:hover { background:#f0f0f0; transform: translateY(-2px); }
+.mg-btn.danger { background:#ff4757; color:#fff; }
+.mg-btn.danger:hover { background:#ff3742; transform: translateY(-2px); }
+.mg-btn.secondary { background: rgba(255,255,255,.2); color:#fff; }
+.mg-btn.secondary:hover { background: rgba(255,255,255,.3); transform: translateY(-2px); }
+.mg-chapter { background: rgba(255,255,255,.1); border-radius:8px; padding:.8rem; margin-bottom:.6rem; }
+.mg-chapter .head { display:flex; justify-content:space-between; margin-bottom:.4rem; }
+.mg-chapter .title { font-weight:500; }
+.mg-chapter .num { font-size:.9rem; opacity:.85; }
+@@media (max-width: 992px) { .mg-wrapper { grid-template-columns: 1fr; } }
+</style>
+
+<div class="container py-3 mg">
+    <div class="mg-bg p-3 p-md-4">
+        <header class="mg-header">
+            <div class="mg-logo">TradusApp</div>
+            <p class="mg-tag">Plataforma de Traducciones Colaborativas</p>
+            <p class="mg-sub">Comparte y lee traducciones de obras de dominio público o con licencia libre.</p>
+        </header>
+
+        <div class="mg-wrapper">
+            <!-- Lista de libros -->
+            <section class="mg-list">
+                <div class="mg-title">Mis Traducciones</div>
+                @foreach (var b in Model.BookList)
+                {
+                    var active = Model.Book?.Id == b.Id ? "active" : string.Empty;
+                    <div class="mg-item @active">
+                        <a class="text-white text-decoration-none me-2 flex-grow-1" href="@Url.Page("/Books/Manage", new { id = b.Id })">
+                            <div class="name">@b.Titulo</div>
+                            <div class="meta d-flex justify-content-between"><span>@b.Autor</span><span>@b.Capitulos capítulos</span></div>
+                        </a>
+                    </div>
+                }
+                <div class="mt-2">
+                    <a class="mg-btn secondary w-100 d-block text-center text-decoration-none" asp-page="/Books/Manage">+ Nueva Traducción</a>
+                </div>
+            </section>
+
+            <!-- Detalle/gestión del libro -->
+            <section class="mg-details">
+                <div class="mg-title">Gestionar Traducción</div>
+
+                @if (Model.Book is null)
+                {
+                    <div class="text-center py-5" style="opacity:.9;">
+                        <div style="font-size:2.5rem;opacity:.6;">??</div>
+                        <p class="mt-2">Selecciona un libro en la lista para comenzar</p>
+                    </div>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="UpdateBook">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Book.Id" value="@Model.Book.Id" />
+                        <div class="mg-form-group">
+                            <label class="mg-label">Título de la Obra</label>
+                            <input class="mg-input" name="Book.Titulo" value="@Model.Book.Titulo" />
+                        </div>
+                        <div class="mg-form-group">
+                            <label class="mg-label">Autor Original</label>
+                            <input class="mg-input" name="Book.Autor" value="@Model.Book.Autor" />
+                        </div>
+                        <div class="mg-form-group">
+                            <label class="mg-label">Idioma</label>
+                            <input class="mg-input" name="Book.Idioma" value="@Model.Book.Idioma" />
+                        </div>
+                        <div class="mg-form-group">
+                            <label class="mg-label">Descripción</label>
+                            <textarea class="mg-textarea" name="Book.Descripcion">@Model.Book.Descripcion</textarea>
+                        </div>
+                        <div class="mg-actions">
+                            <button type="submit" class="mg-btn primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                    <form method="post" asp-page-handler="DeleteBook" onsubmit="return confirm('¿Eliminar libro y su contenido?');" class="mt-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Book.Id" value="@Model.Book.Id" />
+                        <button type="submit" class="mg-btn danger">Eliminar Traducción</button>
+                    </form>
+
+                    <div class="chapters-section mt-4">
+                        <div class="mg-title">Capítulos</div>
+                        @foreach (var c in Model.Book.Capitulos)
+                        {
+                            <div class="mg-chapter">
+                                <div class="head">
+                                    <span class="title">@c.Titulo</span>
+                                    <span class="num">Cap. @c.Numero</span>
+                                </div>
+                                <div class="meta">Versión: @c.VersionActual</div>
+                                <div class="mt-2">
+                                    <a class="mg-btn secondary" asp-page="/Chapters/Details" asp-route-id="@c.Id">Abrir</a>
+                                    <a class="mg-btn secondary" asp-page="/Chapters/Edit" asp-route-id="@c.Id">Editar</a>
+                                </div>
+                            </div>
+                        }
+
+                        <form method="post" asp-page-handler="CreateChapter" class="mt-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Book.NewChapter.LibroId" value="@Model.Book.Id" />
+                            <div class="row g-2">
+                                <div class="col-sm-3">
+                                    <input class="mg-input w-100" name="Book.NewChapter.Numero" value="@Model.Book.NewChapter.Numero" placeholder="#" />
+                                </div>
+                                <div class="col-sm-9">
+                                    <input class="mg-input w-100" name="Book.NewChapter.Titulo" value="@Model.Book.NewChapter.Titulo" placeholder="Título del capítulo" />
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <textarea class="mg-textarea w-100" name="Book.NewChapter.Contenido" placeholder="Contenido..."></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-2 text-end">
+                                <button class="mg-btn secondary" type="submit">+ Agregar Nuevo Capítulo</button>
+                            </div>
+                        </form>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</div>

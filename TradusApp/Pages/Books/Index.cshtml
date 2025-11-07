@@ -1,0 +1,56 @@
+@page
+@model TradusApp.Pages.Books.IndexModel
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@{
+    ViewData["Title"] = "Libros";
+}
+<div class="container py-4">
+    <h1 class="mb-4">Libros</h1>
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-4">
+            <input asp-for="Search" placeholder="Título" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <input asp-for="Author" placeholder="Autor" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <input asp-for="Language" placeholder="Idioma" class="form-control" />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Idioma</th>
+                    <th>Capítulos</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Books)
+            {
+                <tr>
+                    <td>@item.Titulo</td>
+                    <td>@item.Autor</td>
+                    <td>@item.Idioma</td>
+                    <td>@item.Capitulos</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        @Html.PagedListPager(
+            Model.Books,
+            page => Url.Page("./Index", new { page, search = Model.Search, author = Model.Author, language = Model.Language })
+        )
+    </div>
+</div>
