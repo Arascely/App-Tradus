@@ -1,0 +1,28 @@
+@model TradusApp.Models.Chapters.CommentEditDto
+@{
+    ViewData["Title"] = "Editar Comentario";
+}
+<div class="container py-4">
+    <h1 class="mb-4">Editar Comentario</h1>
+
+    <form asp-action="EditComment" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3">
+            <label asp-for="Autor" class="form-label"></label>
+            <input asp-for="Autor" class="form-control" />
+            <span asp-validation-for="Autor" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Contenido" class="form-label"></label>
+            <textarea asp-for="Contenido" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Contenido" class="text-danger"></span>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Guardar</button>
+            <a class="btn btn-secondary" asp-controller="Books" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
