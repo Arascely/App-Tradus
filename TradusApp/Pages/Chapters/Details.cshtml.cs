@@ -56,15 +56,9 @@ public class DetailsModel : PageModel
             .ProjectTo<CommentItemDto>(_mapper.ConfigurationProvider)
             .ToPagedListAsync(pageNumber, pageSize);
 
-        // Mapear Fecha (legacy) manual por si no lo hizo AutoMapper (ya configurado, pero aseguramos)
-        foreach (var item in commentsPaged)
-        {
-            item.Fecha = item.CreatedAt;
-        }
-        foreach (var v in chapterDto.Versions)
-        {
-            v.Fecha = v.CreatedAt;
-        }
+        // Asegurar compatibilidad del nombre Fecha
+        foreach (var item in commentsPaged) item.Fecha = item.CreatedAt;
+        foreach (var v in chapterDto.Versions) v.Fecha = v.CreatedAt;
 
         ViewModel = new ChapterDetailsPageViewModel
         {
@@ -99,15 +93,23 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnPostStartEditAsync(Guid commentId)
     {
+        var repo = _uow.Repository<Comment>();
+        var comment = await repo.Query().FirstOrDefaultAsync(c => c.Id == commentId);
+        if (comment == null) return new NotFoundResult();
+
         EditingCommentId = commentId;
-        // Recargar página manteniendo la edición
-        return await OnGetAsync(NewComment.CapituloId, null, 1);
+        // Recargar página manteniendo estado de edición
+        return await OnGetAsync(comment.CapituloId, null, 1);
     }
 
     public async Task<IActionResult> OnPostCancelEditAsync(Guid commentId)
     {
+        var repo = _uow.Repository<Comment>();
+        var comment = await repo.Query().FirstOrDefaultAsync(c => c.Id == commentId);
+        if (comment == null) return new NotFoundResult();
+
         EditingCommentId = null;
-        return await OnGetAsync(NewComment.CapituloId, null, 1);
+        return await OnGetAsync(comment.CapituloId, null, 1);
     }
 
     public async Task<IActionResult> OnPostSaveEditAsync(Guid commentId, string autor, string contenido)
@@ -127,8 +129,8 @@ public class DetailsModel : PageModel
             return await OnGetAsync(comment.CapituloId, null, 1);
         }
 
-        comment.Autor = autor;
-        comment.Contenido = contenido;
+        comment.Autor = autor.Trim();
+        comment.Contenido = contenido.Trim();
         repo.Update(comment);
         await _uow.SaveChangesAsync();
         return RedirectToPage(new { id = comment.CapituloId });
